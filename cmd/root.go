@@ -35,7 +35,7 @@ Forget the tedious setup rituals; dys makes it seamless:
 The go-to for code junkies who value their time. Use dys, or DIY!`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help(
+		cmd.Help()
 	},
 }
 
