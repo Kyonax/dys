@@ -1,23 +1,50 @@
-name: Lint Go Code
+name: golangci-lint
 
 on:
   push:
     branches:
-      - master
-      - develop
+      - '**'
 
 jobs:
-  lint:
-    runs-on: ubuntu-20.04
+  linter:
+    name: golangci-lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        go-version: [stable, oldstable]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      CGO_ENABLED: 0
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          stable: 'false'
-          go-version: '1.22.4'
+          go-version: ${{ matrix.go-version }}
 
-      - name: Lint
+      - name: Check and get dependencies
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.26.0
+          go mod tidy
+          git diff --exit-code go.mod
+          git diff --exit-code go.sum
 
-          golangci-lint run
+      - name: Install plugins
+        run: |
+          git clone https://github.com/golangci/example-plugin-linter.git
+          cd example-plugin-linter
+          go build -o '${{ github.workspace }}/.plugins/example.so' -buildmode=plugin plugin/example.go
+        working-directory: ${{ runner.temp }}
+        env:
+          CGO_ENABLED: 1
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59.1
+          install-mode: goinstall
+          args: --timeout=10m
+
+      - name: Test
+        run: go test -v -cover ./...
+
+      - name: Build
+        run: go build -v -ldflags "-s -w" -trimpath
