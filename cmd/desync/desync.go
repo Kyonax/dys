@@ -5,6 +5,8 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package desync
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +16,10 @@ var DesyncCmd = &cobra.Command{
 	Short: "",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		err := cmd.Help()
+		if err != nil {
+			os.Exit(1)
+		}
 	},
 }
 
