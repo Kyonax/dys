@@ -23,7 +23,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "dys",
 	Short: "Sync your dot-files, zero-friction",
-	Long: `Dot-files Yield Script is a CLI tool for all of us who love to tweak and personalize our setups to perfection. Who’s got time to waste on manual configs? Let dys streamline the process.
+	Long: `Dot-files Yield Script is a CLI tool for all of us who love to tweak and personalize our setups to perfection. Who's got time to waste manually moving configs? Let dys streamline the process.
 
 With a single command, you can download your dot-files and integrate them into any device.
 Forget the tedious setup rituals; dys makes it seamless:
@@ -36,9 +36,7 @@ The go-to for code junkies who value their time. Use dys, or DIY!`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		err := cmd.Help()
-		if err != nil {
-			os.Exit(1)
-		}
+		cobra.CheckErr(err)
 	},
 }
 
@@ -46,16 +44,7 @@ The go-to for code junkies who value their time. Use dys, or DIY!`,
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
-}
-
-func addSubCommands() {
-	rootCmd.AddCommand(check.CheckCmd)
-	rootCmd.AddCommand(desync.DesyncCmd)
-	rootCmd.AddCommand(sync.SyncCmd)
-	rootCmd.AddCommand(yield.YieldCmd)
+	cobra.CheckErr(err)
 }
 
 func init() {
@@ -65,12 +54,12 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dys.yaml)")
+	//rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dys.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	addSubCommands()
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	commandHandler()
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -95,4 +84,11 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func commandHandler() {
+	rootCmd.AddCommand(check.CheckCmd)
+	rootCmd.AddCommand(desync.DesyncCmd)
+	rootCmd.AddCommand(sync.SyncCmd)
+	rootCmd.AddCommand(yield.YieldCmd)
 }

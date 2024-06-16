@@ -5,8 +5,6 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package check
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
@@ -17,9 +15,7 @@ var CheckCmd = &cobra.Command{
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := cmd.Help()
-		if err != nil {
-			os.Exit(1)
-		}
+		cobra.CheckErr(err)
 	},
 }
 
