@@ -41,8 +41,8 @@ jobs:
           install-mode: goinstall
           args: --timeout=10m
 
-      - name: Test
+      - name: Running All Tests
         run: go test -v -cover ./...
 
-      - name: Build
+      - name: Build App
         run: go build -v -ldflags "-s -w" -trimpath
